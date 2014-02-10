@@ -29,7 +29,8 @@ import javax.jms.MapMessage;
                   mapMessage.getString("emailCreative"),
                   mapMessage.getString("subjectLine"),
                   mapMessage.getString("fromAddress"),
-                  mapMessage.getString("fromName")
+                  mapMessage.getString("fromName"),
+                  mapMessage.getInt("templateId")
                   );
                   
                   try

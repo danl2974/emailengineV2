@@ -46,6 +46,7 @@ public class BatchQueueProducer {
     	this.request = request;
     	this.batchData = batchData; 	
     }
+      
     
     //DO MAIN STUFF HERE
     public int processBatch(){
@@ -60,8 +61,11 @@ public class BatchQueueProducer {
     		 String email = recipientData.getKey();
     		 HashMap<String,String> uniqueParams = (HashMap<String,String>) recipientData.getValue();
     		 log.info("processBatch - " + email);
-    		 String assembledMessage = MessageAssembler.replaceTokens(templateData.getCreative(), uniqueParams);
-    		 MapMessage jmsMessage = createJmsMessage(email, templateData, assembledMessage);
+    		 MailingProperties mprop = new MailingProperties(email, this.request.getTemplateId());
+    		 mprop.domain = templateData.getDomain();
+    		 String detokenedMessage = MessageAssembler.replaceTokens(templateData.getCreative(), uniqueParams);
+    		 String assembledMessage = MessageAssembler.convertTrackingLinks(detokenedMessage, mprop);
+    		 MapMessage jmsMessage = createJmsMessage(email, templateData, assembledMessage, mprop);
     		 try{
     		    this.messageProducer.send(jmsMessage);
     		 }catch (JMSException jmse) {
@@ -127,7 +131,7 @@ public class BatchQueueProducer {
             
     }
     
-    public MapMessage createJmsMessage(String email, TemplatePersist templateData, String message)
+    public MapMessage createJmsMessage(String email, TemplatePersist templateData, String message, MailingProperties mailingProperties)
     {
     	MapMessage mapMessage = null;	
             try
@@ -138,6 +142,7 @@ public class BatchQueueProducer {
               mapMessage.setString("subjectLine", templateData.getSubjectline());
               mapMessage.setString("fromAddress", templateData.getFromaddress());
               mapMessage.setString("fromName", templateData.getFromname());
+              mapMessage.setInt("templateId", mailingProperties.templateId);
             }
             catch (JMSException e) {
               log.error(e.getMessage());      

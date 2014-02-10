@@ -26,6 +26,11 @@ public class TemplatePersist implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
+    
+    @NotNull
+    @NotEmpty
+    @Column(name = "domain")
+    private String domain;
 
     @NotNull
     @NotEmpty
@@ -85,6 +90,14 @@ public class TemplatePersist implements Serializable {
 
     public void setFromname(String fromname) {
         this.fromname = fromname;
+    }
+    
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
 

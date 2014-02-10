@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -26,12 +28,21 @@ public class MessageAssembler {
         public String subjectLine;
         public String fromAddress;
         public String fromName;
+        public String domain;
         
         public MessageAssembler(int templateId, HashMap<String, String> tokenKVPairs)
         {
                 getTemplate(templateId);
                 this.assembledMessage = replaceTokens(this.template, tokenKVPairs);
         }
+        
+        public MessageAssembler(int templateId, HashMap<String, String> tokenKVPairs, MailingProperties mailingProperties)
+        {
+                getTemplate(templateId);
+                //resolve domain dependent on getTemplate
+                mailingProperties.domain = this.domain;
+                this.assembledMessage = convertTrackingLinks(replaceTokens(this.template, tokenKVPairs), mailingProperties);
+        }        
         
         public void getTemplate(int templateId)
         {
@@ -52,6 +63,28 @@ public class MessageAssembler {
                 
         }
         
+        
+        public static String convertTrackingLinks(String text, MailingProperties mailingProperties)
+        {
+            String regex = "\\s*(?i)href\\s*=\\s*(\"([^\"]*\")|'[^']*'|([^'\">\\s]+))";
+            Pattern p = Pattern.compile(regex);
+            Matcher m = p.matcher(text);
+            
+            String clickUrl = String.format("http://c.%s/track?type=click&t=%d&r=%s", mailingProperties.domain, mailingProperties.templateId, mailingProperties.hexRecipient);
+            String openUrl = String.format("http://c.%s/track?type=open&t=%d&r=%s", mailingProperties.domain, mailingProperties.templateId, mailingProperties.hexRecipient);
+            StringBuffer sb = new StringBuffer();
+            log.info(clickUrl);
+
+            while(m.find())
+            {
+               String found = m.group(0);
+               String hyperlink = deriveHrefUrl(found);
+               m.appendReplacement(sb, " href=\"" + clickUrl + "&&&" + hyperlink + "\"");
+            }
+            m.appendTail(sb);
+            return sb.toString().replace("</body>", openUrl + "</body>");
+         }
+        
         private void checkCache(int templateId)
         {
            //Redis in-memory cache key-value store - Jedis (Java Client)        
@@ -67,6 +100,7 @@ public class MessageAssembler {
                this.subjectLine = templateVals.get(1);
                this.fromAddress = templateVals.get(2);
                this.fromName = templateVals.get(3);
+               this.domain = templateVals.get(4);
         	 }
         	 catch(Exception e){
         		 log.error(e.getMessage());
@@ -82,6 +116,7 @@ public class MessageAssembler {
                this.subjectLine = templateData.getSubjectline();
                this.fromAddress = templateData.getFromaddress();
                this.fromName = templateData.getFromname();
+               this.domain = templateData.getDomain();
                addRedisCache(templateId, templateData);
         	  }
        	      catch(Exception e){
@@ -158,6 +193,7 @@ public class MessageAssembler {
                redisHashMap.put("subjectline", templateData.getSubjectline());
                redisHashMap.put("fromaddress", templateData.getFromaddress());
                redisHashMap.put("fromname", templateData.getFromname());
+               redisHashMap.put("domain", templateData.getDomain());
                jedis.hmset(String.valueOf(templateId), redisHashMap);
                jedis.expire(String.valueOf(templateId), 60);
                }
@@ -165,5 +201,12 @@ public class MessageAssembler {
                log.error(e.getMessage());
             }
           
+        }
+        
+        // extract hyperlink from href expression
+        private static String deriveHrefUrl(String href)
+        {
+        	String[] parts = href.split("\"");
+        	return parts[1];
         }
 }

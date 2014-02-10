@@ -24,6 +24,7 @@ public class SMTPClient {
         private String fromName;
         private String subjectLine;
         private String emailCreative;
+        private int templateId;
         
         public SMTPClient(String emailAddress, String emailCreative, String subjectLine, String fromAddress, String fromName) 
         {
@@ -38,11 +39,27 @@ public class SMTPClient {
         
         }
         
+        public SMTPClient(String emailAddress, String emailCreative, String subjectLine, String fromAddress, String fromName, int templateId) 
+        {
+        
+        this.properties.setProperty("mail.smtp.host", "localhost");
+        this.session = Session.getDefaultInstance(this.properties);
+        this.toAddress = emailAddress;
+        this.emailCreative = emailCreative;
+        this.fromAddress = fromAddress;
+        this.fromName = fromName;
+        this.subjectLine = subjectLine;
+        this.templateId = templateId;
+        
+        }
+        
         
         public void sendmail()
         {
-           try{
+        try{
           MimeMessage message = new MimeMessage(this.session);
+          message.setHeader("X-MailingID", String.format("%d", this.templateId));
+          message.setHeader("X-FBL", MailingProperties.base64(this.toAddress));
           message.setFrom(new InternetAddress(this.fromAddress, this.fromName));
           message.addRecipient(Message.RecipientType.TO,
                                   new InternetAddress(this.toAddress));

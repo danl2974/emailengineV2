@@ -39,6 +39,8 @@ public class MessageQueueProducer {
     private Destination destination;
     private MapMessage mapMessage;
     
+    private MailingProperties mailingProperties;
+    
     
     /*
     public MessageQueueProducer(EmailRequest request) {
@@ -55,7 +57,8 @@ public class MessageQueueProducer {
     
     public void initialize(){
             // resolve the message assembly
-            MessageAssembler ma = new MessageAssembler(this.request.getTemplateId(), this.request.getParameters());
+    	    this.mailingProperties = new MailingProperties(this.request.getEmailAddress(), this.request.getTemplateId());
+            MessageAssembler ma = new MessageAssembler(this.request.getTemplateId(), this.request.getParameters(), this.mailingProperties);
             
             this.emailMessage.emailCreative = ma.getAssembledMessage();
             this.emailMessage.emailAddress = this.request.getEmailAddress();
@@ -103,10 +106,11 @@ public class MessageQueueProducer {
               this.mapMessage.setString("subjectLine", emailMessage.subjectLine);
               this.mapMessage.setString("fromAddress", emailMessage.fromAddress);
               this.mapMessage.setString("fromName", emailMessage.fromName);
-              
+              this.mapMessage.setInt("templateId", this.mailingProperties.templateId);
+             
             }
             catch (JMSException e) {
-                    
+                 log.info(e.getMessage()); 
             }
     }
     
