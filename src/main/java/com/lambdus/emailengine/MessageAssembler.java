@@ -82,7 +82,7 @@ public class MessageAssembler {
                m.appendReplacement(sb, " href=\"" + clickUrl + "&&&" + hyperlink + "\"");
             }
             m.appendTail(sb);
-            return sb.toString().replace("</body>", openUrl + "</body>");
+            return sb.toString().replace("</body>", "<img src=\"" + openUrl + "\" width=\"1\" height=\"1\" style=\"border-width:0; border-style:hidden;\" Alt=\"\" /></body>");
          }
         
         private void checkCache(int templateId)
