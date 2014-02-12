@@ -41,9 +41,9 @@ public class SMTPClient {
         
         public SMTPClient(String emailAddress, String emailCreative, String subjectLine, String fromAddress, String fromName, int templateId) 
         {
-        
         this.properties.setProperty("mail.smtp.host", "localhost");
-        this.session = Session.getDefaultInstance(this.properties);
+        //this.properties.setProperty("mail.smtp.port", "2527");
+        this.session = Session.getInstance(this.properties);
         this.toAddress = emailAddress;
         this.emailCreative = emailCreative;
         this.fromAddress = fromAddress;
@@ -57,6 +57,7 @@ public class SMTPClient {
         public void sendmail()
         {
         try{
+          /*	
           MimeMessage message = new MimeMessage(this.session);
           message.setHeader("X-MailingID", String.format("%d", this.templateId));
           message.setHeader("X-FBL", MailingProperties.base64(this.toAddress));
@@ -66,6 +67,18 @@ public class SMTPClient {
           message.setSubject(this.subjectLine);
           message.setContent(this.emailCreative,
                                     "text/html");
+          */
+          CustomMimeMessage message = new CustomMimeMessage(this.session);
+          message.setHeader("X-MailingID", String.format("%d", this.templateId));
+          message.setHeader("X-FBL", MailingProperties.base64(this.toAddress));
+          message.setFrom(new InternetAddress(this.fromAddress, this.fromName));
+          message.addRecipient(Message.RecipientType.TO,
+                                    new InternetAddress(this.toAddress));
+          message.setSubject(this.subjectLine);
+          message.setContent(this.emailCreative,
+                                      "text/html; charset=\"UTF-8\"");
+          message.setMessageIDDomain(this.fromAddress);
+          
           Transport.send(message);
           
       }catch (MessagingException mex) {
