@@ -73,6 +73,7 @@ public class BatchProcessor implements Callable<String> {
 		    	log.error(e.getMessage());
 		     }
 		     
+		     con.close();
 		     log.info("Query Text " + queryText);	     
 		     
 		} catch (SQLException e) {
@@ -111,7 +112,7 @@ public class BatchProcessor implements Callable<String> {
 				 }
 				 userData.put(rs.getString(batchtarget.getEmailAddress()), fieldmap);
 			 }
-			 
+			 con.close();
 		 } 
 		 catch (SQLException e) {
 				log.info(e.getMessage());
