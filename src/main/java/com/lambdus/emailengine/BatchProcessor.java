@@ -30,6 +30,12 @@ public class BatchProcessor implements Callable<String> {
 	 //Azure instance
 	 private static String azureConnection = "jdbc:sqlserver://v8st4k97ey.database.windows.net:1433;database=email_engine;user=email_engine@v8st4k97ey;password=!Lambdus2200;encrypt=true;hostNameInCertificate=*.database.windows.net;loginTimeout=30;";
 	 
+	 private String targetDbHost = null;
+	 private String targetDbMs = null;
+	 private String targetDbPort = null;
+	 private String targetDbUser = null;
+	 private String targetDbPassword = null;
+	 
 	
 	 public BatchProcessor(BatchRequest request)
 	 {
@@ -67,6 +73,11 @@ public class BatchProcessor implements Callable<String> {
 		     }
 		       while(rs.next()){
 		       queryText = rs.getString("queryText");
+		  	   this.targetDbHost = rs.getString("dbhost");
+			   this.targetDbMs = rs.getString("dbms");
+			   this.targetDbPort = rs.getString("dbport");
+			   this.targetDbUser = rs.getString("dbuser");
+			   this.targetDbPassword = rs.getString("dbpassword");
 		       }
 		     }
 		     catch(Exception e){
@@ -90,13 +101,19 @@ public class BatchProcessor implements Callable<String> {
 	 public HashMap<String,Object> processQuery(String query, BatchTarget batchtarget)
 	 {
 		log.info("Query " + query);
+				
 		ResultSet rs;
 		HashMap<String,Object> userData = new HashMap<String,Object>();
 		 try {
-			 // Use this for production
-			 //Connection con = DriverManager.getConnection(jdbcHandle, dbusername, dbpassword);
+			// Use this for production
+			 CredentialSecurityDES csDes = new CredentialSecurityDES();
+			 String jdbcFormat = String.format("jdbc:%s://%s:%s", this.targetDbMs, this.targetDbHost, this.targetDbPort);
+			 log.info(jdbcFormat);
+			 Connection con = DriverManager.getConnection(jdbcFormat, this.targetDbUser, csDes.decrypt(this.targetDbPassword) );
 			 //Azure Test Conn String
-			 Connection con = DriverManager.getConnection(azureConnection);
+			 //Connection con = DriverManager.getConnection(azureConnection);
+			 
+			 
 			 Statement stmt = con.createStatement();
 			 rs = stmt.executeQuery(query);
 			 
@@ -114,9 +131,12 @@ public class BatchProcessor implements Callable<String> {
 			 }
 			 con.close();
 		 } 
-		 catch (SQLException e) {
-				log.info(e.getMessage());
+		 catch (SQLException sqle) {
+				log.info(sqle.getMessage());
 			}
+		 catch (Exception e){
+			 log.info(e.getMessage()); 
+		 }
 	 
 		 return userData;
 	 }

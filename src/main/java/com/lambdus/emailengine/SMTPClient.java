@@ -42,7 +42,7 @@ public class SMTPClient {
         public SMTPClient(String emailAddress, String emailCreative, String subjectLine, String fromAddress, String fromName, int templateId) 
         {
         this.properties.setProperty("mail.smtp.host", "localhost");
-        //this.properties.setProperty("mail.smtp.port", "2527");
+        this.properties.setProperty("mail.smtp.port", "587");
         this.session = Session.getInstance(this.properties);
         this.toAddress = emailAddress;
         this.emailCreative = emailCreative;
