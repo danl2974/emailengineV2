@@ -2,10 +2,9 @@ package com.lambdus.emailengine;
 
 import java.math.BigInteger;
 
-import org.apache.commons.codec.binary.Base64;
+import sun.misc.BASE64Encoder;
 
 import java.nio.charset.Charset;
-
 
 
 public class MailingProperties {
@@ -29,9 +28,8 @@ public class MailingProperties {
 	}
 	
 	public static String base64(String emailAddress){
-		
-		byte[] b64bytes = Base64.encodeBase64(emailAddress.getBytes());
-		return new String(b64bytes);
+		BASE64Encoder base64encoder = new BASE64Encoder();
+		return base64encoder.encode(emailAddress.getBytes());
 		
 	}
 	

@@ -32,6 +32,7 @@ public class BatchProcessor implements Callable<String> {
 	 
 	 private String targetDbHost = null;
 	 private String targetDbMs = null;
+	 private String targetDbName = null;
 	 private String targetDbPort = null;
 	 private String targetDbUser = null;
 	 private String targetDbPassword = null;
@@ -75,6 +76,7 @@ public class BatchProcessor implements Callable<String> {
 		       queryText = rs.getString("queryText");
 		  	   this.targetDbHost = rs.getString("dbhost");
 			   this.targetDbMs = rs.getString("dbms");
+			   this.targetDbName = rs.getString("dbname");
 			   this.targetDbPort = rs.getString("dbport");
 			   this.targetDbUser = rs.getString("dbuser");
 			   this.targetDbPassword = rs.getString("dbpassword");
@@ -98,18 +100,45 @@ public class BatchProcessor implements Callable<String> {
 		 
 	 }
 	 
+	public enum JdbcDriver {
+	    	sqlserver, mysql, postgresql
+	    }
+	 
 	 public HashMap<String,Object> processQuery(String query, BatchTarget batchtarget)
 	 {
 		log.info("Query " + query);
-				
+  	    String jdbcFormat;
+  	    Connection con = null;		
 		ResultSet rs;
 		HashMap<String,Object> userData = new HashMap<String,Object>();
 		 try {
 			// Use this for production
 			 CredentialSecurityDES csDes = new CredentialSecurityDES();
-			 String jdbcFormat = String.format("jdbc:%s://%s:%s", this.targetDbMs, this.targetDbHost, this.targetDbPort);
-			 log.info(jdbcFormat);
-			 Connection con = DriverManager.getConnection(jdbcFormat, this.targetDbUser, csDes.decrypt(this.targetDbPassword) );
+			 
+	    	 JdbcDriver driver = JdbcDriver.valueOf(this.targetDbMs);
+	    	 switch(driver)
+	    	   {
+	    	   case sqlserver: 
+	    		   Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+	    	       jdbcFormat = String.format("jdbc:%s://%s:%s;database=%s;user=%s;password=%s;", this.targetDbMs, this.targetDbHost, this.targetDbPort, this.targetDbName, this.targetDbUser, csDes.decrypt(this.targetDbPassword));
+	    	       con = DriverManager.getConnection(jdbcFormat);
+	    	   break;
+	    	   case mysql: 
+	    		   Class.forName("com.mysql.jdbc.Driver");
+	    	       jdbcFormat = String.format("jdbc:%s://%s:%s/%s", this.targetDbMs, this.targetDbHost, this.targetDbPort, this.targetDbName);
+	    	       con = DriverManager.getConnection(jdbcFormat, this.targetDbUser, csDes.decrypt(this.targetDbPassword));
+	    	   break;
+	    	   case postgresql:
+	    		   Class.forName("org.postgresql.Driver");
+	    	       jdbcFormat = String.format("jdbc:%s://%s:%s/%s", this.targetDbMs, this.targetDbHost, this.targetDbPort, this.targetDbName);
+	    	       con = DriverManager.getConnection(jdbcFormat, this.targetDbUser, csDes.decrypt(this.targetDbPassword));
+	    	    break;
+	    	   }
+			 
+			 
+			 //String jdbcFormat = String.format("jdbc:%s://%s:%s", this.targetDbMs, this.targetDbHost, this.targetDbPort);
+			 //log.info(jdbcFormat);
+			 //Connection con = DriverManager.getConnection(jdbcFormat, this.targetDbUser, csDes.decrypt(this.targetDbPassword) );
 			 //Azure Test Conn String
 			 //Connection con = DriverManager.getConnection(azureConnection);
 			 
@@ -132,10 +161,10 @@ public class BatchProcessor implements Callable<String> {
 			 con.close();
 		 } 
 		 catch (SQLException sqle) {
-				log.info(sqle.getMessage());
+				log.error(sqle.getMessage());
 			}
 		 catch (Exception e){
-			 log.info(e.getMessage()); 
+			 log.error(e.getMessage()); 
 		 }
 	 
 		 return userData;
