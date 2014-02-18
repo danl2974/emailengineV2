@@ -47,13 +47,13 @@ public class BatchCampaignController implements IBatchCampaignController {
         request.setTemplateId(this.templateId);
         
         BatchProcessor bp = new BatchProcessor(request);
-        FutureTask<Integer> futureTask = new FutureTask<Integer>(bp);
+        //FutureTask futureTask = new FutureTask(bp);
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         //executorService.submit(futureTask);
  
         String uuid = UUID.randomUUID().toString();
         Integer result = 0;
-        FutureTask<Integer> submittedBatchTask = (FutureTask<Integer>) executorService.submit(futureTask);
+        FutureTask<Integer> submittedBatchTask = (FutureTask<Integer>) executorService.submit(bp);
         
          while(!submittedBatchTask.isDone()){
          try{result = submittedBatchTask.get();}
@@ -88,7 +88,7 @@ public class BatchCampaignController implements IBatchCampaignController {
 	    return uuid;
 	}
 	
-	public static boolean addBatchCampaignMonitorData(String status, String uuid){
+	private boolean addBatchCampaignMonitorData(String status, String uuid){
 		
 		Connection con = null;
 		CallableStatement callableStatement = null;
