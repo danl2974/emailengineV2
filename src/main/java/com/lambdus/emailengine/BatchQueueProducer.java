@@ -68,6 +68,7 @@ public class BatchQueueProducer {
     		 MapMessage jmsMessage = createJmsMessage(email, templateData, assembledMessage, mprop);
     		 try{
     		    this.messageProducer.send(jmsMessage);
+    		    totalProcessed ++;
     		 }catch (JMSException jmse) {
     	        log.error(jmse.getMessage());
     	      }

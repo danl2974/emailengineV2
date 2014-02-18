@@ -14,7 +14,7 @@ import java.util.concurrent.Callable;
 import org.jboss.logging.Logger;
 
 
-public class BatchProcessor implements Callable<String> {
+public class BatchProcessor implements Callable<Integer> {
 	
 	 private static final Logger log = Logger.getLogger(BatchProcessor.class.getName());
 	
@@ -190,14 +190,15 @@ public class BatchProcessor implements Callable<String> {
 	 
 	 
 	   @Override
-	   public String call() throws Exception {
+	   public Integer call() throws Exception {
 		    String targetQueryText = fetchTarget();
 		    HashMap<String,Object> batchDirectiveHash = processQuery(targetQueryText, batchtarget);
 		    BatchQueueProducer bqp = new BatchQueueProducer();
 		    bqp.initialize(batchDirectiveHash, request);
 		    int processed = bqp.processBatch();
-		    String batchResultInfo = String.format("%s %s",Thread.currentThread().getName(), String.valueOf(processed) );
-	        return batchResultInfo;
+		    return processed;
+		    //String batchResultInfo = String.format("%s %s",Thread.currentThread().getName(), String.valueOf(processed) );
+	        //return batchResultInfo;
 	    }
 	 
 	
