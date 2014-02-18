@@ -35,7 +35,8 @@ import javax.jms.MapMessage;
                   mapMessage.getString("subjectLine"),
                   mapMessage.getString("fromAddress"),
                   mapMessage.getString("fromName"),
-                  mapMessage.getInt("templateId")
+                  mapMessage.getInt("templateId"),
+                  mapMessage.getString("uuid")
                   );
                   
                   try

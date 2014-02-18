@@ -107,6 +107,7 @@ public class MessageQueueProducer {
               this.mapMessage.setString("fromAddress", emailMessage.fromAddress);
               this.mapMessage.setString("fromName", emailMessage.fromName);
               this.mapMessage.setInt("templateId", this.mailingProperties.templateId);
+              this.mapMessage.setString("uuid", this.mailingProperties.uuid);
              
             }
             catch (JMSException e) {

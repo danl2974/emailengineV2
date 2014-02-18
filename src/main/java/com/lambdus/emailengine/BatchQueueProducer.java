@@ -61,7 +61,7 @@ public class BatchQueueProducer {
     		 String email = recipientData.getKey();
     		 HashMap<String,String> uniqueParams = (HashMap<String,String>) recipientData.getValue();
     		 log.info("processBatch - " + email);
-    		 MailingProperties mprop = new MailingProperties(email, this.request.getTemplateId());
+    		 MailingProperties mprop = new MailingProperties(email, this.request.getTemplateId(), this.request.getUuid());
     		 mprop.domain = templateData.getDomain();
     		 String detokenedMessage = MessageAssembler.replaceTokens(templateData.getCreative(), uniqueParams);
     		 String assembledMessage = MessageAssembler.convertTrackingLinks(detokenedMessage, mprop);
@@ -144,6 +144,8 @@ public class BatchQueueProducer {
               mapMessage.setString("fromAddress", templateData.getFromaddress());
               mapMessage.setString("fromName", templateData.getFromname());
               mapMessage.setInt("templateId", mailingProperties.templateId);
+              mapMessage.setString("uuid", request.getUuid());
+              
             }
             catch (JMSException e) {
               log.error(e.getMessage());      

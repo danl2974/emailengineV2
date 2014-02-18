@@ -38,5 +38,8 @@
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/javalibs/mysql-connector-java-5.1.29-bin.jar"/>
+	<classpathentry kind="lib" path="C:/javalibs/postgresql-9.3-1100.jdbc4.jar"/>
+	<classpathentry kind="lib" path="C:/javalibs/sqljdbc4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

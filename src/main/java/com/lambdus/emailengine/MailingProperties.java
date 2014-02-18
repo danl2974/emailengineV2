@@ -19,13 +19,25 @@ public class MailingProperties {
 	
 	public String hexRecipient;
 	
+	public String uuid;
+	
+	//Constructor for Tx Mailing
 	public MailingProperties(String emailAddress, int templateId){
 		this.templateId = templateId;
 		this.recipient = emailAddress;
 		this.base64Recipient = base64(emailAddress);
 		this.hexRecipient = hex(emailAddress);
-		
+		//Transactional Email Uuid
+		this.uuid = "tx";
 	}
+	
+	public MailingProperties(String emailAddress, int templateId, String uuid){
+		this.templateId = templateId;
+		this.recipient = emailAddress;
+		this.base64Recipient = base64(emailAddress);
+		this.hexRecipient = hex(emailAddress);
+		this.uuid = uuid;
+	}	
 	
 	public static String base64(String emailAddress){
 		BASE64Encoder base64encoder = new BASE64Encoder();

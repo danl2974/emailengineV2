@@ -41,17 +41,20 @@ public class BatchCampaignController implements IBatchCampaignController {
 	
 	@Override
 	public void startCampaign(){
-
+		
+		String uuid = UUID.randomUUID().toString();
+		String association = resolveAssociation(this.targetId);
+		
         BatchRequest request = new BatchRequest();
         request.setTargetId(this.targetId);
         request.setTemplateId(this.templateId);
+        request.setUuid(uuid);
         
         BatchProcessor bp = new BatchProcessor(request);
         //FutureTask futureTask = new FutureTask(bp);
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         //executorService.submit(futureTask);
  
-        String uuid = UUID.randomUUID().toString();
         Integer result = 0;
         FutureTask<Integer> submittedBatchTask = (FutureTask<Integer>) executorService.submit(bp);
         
@@ -61,12 +64,12 @@ public class BatchCampaignController implements IBatchCampaignController {
          catch (ExecutionException ee) {log.error(ee.getMessage());return;}
          }
          
-    	 addBatchCampaignMonitorData(String.valueOf(result), addNewBatchCampaignMonitor(uuid));
+    	 addBatchCampaignMonitorData(result, addNewBatchCampaignMonitor(uuid, association));
 		 executorService.shutdown();
 	}
 	
 	
-	private String addNewBatchCampaignMonitor(String uuid){
+	private String addNewBatchCampaignMonitor(String uuid, String association){
 	
 		Connection con = null;
 		CallableStatement callableStatement = null;
@@ -76,10 +79,11 @@ public class BatchCampaignController implements IBatchCampaignController {
 	    	 Class.forName("com.mysql.jdbc.Driver");
 		     con = DriverManager.getConnection(jdbcHandle, dbusername, dbpassword);
 		     
-		     String sproc = "{call addBatchCampaign(?,?)}";
+		     String sproc = "{call addBatchCampaign(?,?,?)}";
 		     callableStatement = con.prepareCall(sproc);
 		     callableStatement.setString(1, uuid);
 		     callableStatement.setString(2, startTime);
+		     callableStatement.setString(3, association);
 		     callableStatement.executeUpdate();
 		     callableStatement.close();
 		     con.close();    
@@ -88,17 +92,17 @@ public class BatchCampaignController implements IBatchCampaignController {
 	    return uuid;
 	}
 	
-	private boolean addBatchCampaignMonitorData(String status, String uuid){
+	private boolean addBatchCampaignMonitorData(int total, String uuid){
 		
 		Connection con = null;
 		CallableStatement callableStatement = null;
 	    try {
 	    	 Class.forName("com.mysql.jdbc.Driver");
 		     con = DriverManager.getConnection(jdbcHandle, dbusername, dbpassword);
-		     String sproc = "{call addBatchCampaignMonitorData(?,?)}";
+		     String sproc = "{call addBatchCampaignTotal(?,?)}";
 		     callableStatement = con.prepareCall(sproc);
 		     callableStatement.setString(1, uuid);
-		     callableStatement.setString(2, status);
+		     callableStatement.setInt(2, total);
 		     boolean ex = callableStatement.execute();
 		     con.close();
 		     callableStatement.close();
@@ -107,6 +111,33 @@ public class BatchCampaignController implements IBatchCampaignController {
 	    catch(Exception e){log.error(e.getMessage()); return false;}
 	}	
 	
+	
+	
+	 private String resolveAssociation(int targetId)
+	 {
+		ResultSet rs = null;
+		Connection con = null;
+		CallableStatement callableStatement = null;
+		String association = "";
+	    try {
+	    	 Class.forName("com.mysql.jdbc.Driver");
+	    	 log.info("Before fetTarget JDBC conn call");
+		     con = DriverManager.getConnection(jdbcHandle, dbusername, dbpassword);
+		     
+		     String sproc = "{call getTargetById(?)}";
+		     callableStatement = con.prepareCall(sproc);
+		     callableStatement.setInt(1, targetId);
+		     boolean ex = callableStatement.execute();
+		     rs = callableStatement.getResultSet();
+		     if(ex){
+		            while(rs.next()){association = rs.getString("association");}
+		           }
+	         }
+	     catch(Exception e){log.error(e.getMessage());}
+	    
+	     return association;
+		     
+	   }	     
 	
 	
 	

@@ -70,8 +70,8 @@ public class MessageAssembler {
             Pattern p = Pattern.compile(regex);
             Matcher m = p.matcher(text);
             
-            String clickUrl = String.format("http://c.%s/track?type=click&t=%d&r=%s", mailingProperties.domain, mailingProperties.templateId, mailingProperties.hexRecipient);
-            String openUrl = String.format("http://c.%s/track?type=open&t=%d&r=%s", mailingProperties.domain, mailingProperties.templateId, mailingProperties.hexRecipient);
+            String clickUrl = String.format("http://c.%s/track?type=click&t=%d&r=%s&u=%s", mailingProperties.domain, mailingProperties.templateId, mailingProperties.hexRecipient, mailingProperties.uuid);
+            String openUrl = String.format("http://c.%s/track?type=open&t=%d&r=%s&u=%s", mailingProperties.domain, mailingProperties.templateId, mailingProperties.hexRecipient, mailingProperties.uuid);
             StringBuffer sb = new StringBuffer();
             log.info(clickUrl);
 

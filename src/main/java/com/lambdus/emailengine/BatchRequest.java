@@ -5,6 +5,7 @@ public class BatchRequest {
 
     int targetId = 0;
     int templateId = 0;
+    String uuid = "none";
     
     public void setTargetId(int targetId)
     {
@@ -16,6 +17,11 @@ public class BatchRequest {
             this.templateId = templateId;
     }
     
+    public void setUuid(String uuid)
+    {
+            this.uuid = uuid;
+    }    
+    
     public int getTargetId()
     {
             return this.targetId;
@@ -25,6 +31,11 @@ public class BatchRequest {
     {
             return this.templateId;
     }
+    
+    public String getUuid()
+    {
+            return this.uuid;
+    } 
     
     	
 	
