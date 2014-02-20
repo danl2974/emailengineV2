@@ -10,15 +10,17 @@ public class CustomMimeMessage extends MimeMessage {
 	
 	private String messageId = "mailer";
 	private String domain;
+	private int templateId;
 	
-	public CustomMimeMessage(Session session) {
+	public CustomMimeMessage(Session session, int templateId) {
 	    super(session);
 	    this.session=session;
+	    this.templateId = templateId;
 	}
 	
 	@Override
     protected void updateMessageID() throws MessagingException {
-	setHeader("Message-ID", "<" + String.valueOf(System.currentTimeMillis()) + ".Mailer@" + this.domain + ">");
+	setHeader("Message-ID", "<" + String.valueOf(System.currentTimeMillis()) + "." + this.templateId + ".Mailer@" + this.domain + ">");
     }
 	
 	public void setCustomMessageId(String messageId){

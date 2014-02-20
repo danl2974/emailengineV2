@@ -84,8 +84,8 @@ public class SMTPClient {
           message.setContent(this.emailCreative,
                                     "text/html");
           */
-          CustomMimeMessage message = new CustomMimeMessage(this.session);
-          message.setHeader("X-MailingID", String.format("%d.%s", this.templateId, this.uuid));
+          CustomMimeMessage message = new CustomMimeMessage(this.session, this.templateId);
+          message.setHeader("X-MailingID", String.format("%d::%s", this.templateId, this.uuid));
           message.setHeader("X-FBL", MailingProperties.base64(this.toAddress));
           message.setFrom(new InternetAddress(this.fromAddress, this.fromName));
           message.addRecipient(Message.RecipientType.TO,
