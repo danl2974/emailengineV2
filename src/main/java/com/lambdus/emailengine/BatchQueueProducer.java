@@ -19,6 +19,7 @@ import javax.naming.InitialContext;
 
 import org.jboss.logging.Logger;
 
+import com.lambdus.emailengine.persistence.EventDropLocal;
 import com.lambdus.emailengine.persistence.TemplatePersist;
 import com.lambdus.emailengine.webservices.RestDefinition;
 
@@ -53,6 +54,9 @@ public class BatchQueueProducer {
     	 log.info("processBatch called");
     	 int totalProcessed = 0;
     	 TemplatePersist templateData = MessageAssembler.retrieveTemplateFromDB(this.request.getTemplateId());
+    	 //Drop Campaign Detail
+    	 EventDropLocal.addBatchCampaignDetail(templateData, this.request);
+    	 
     	 log.info("target set size " + String.valueOf(batchData.size()) );
     	 startConnection();
     	

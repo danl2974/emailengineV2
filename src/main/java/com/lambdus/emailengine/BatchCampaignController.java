@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -74,6 +75,7 @@ public class BatchCampaignController implements IBatchCampaignController {
 		Connection con = null;
 		CallableStatement callableStatement = null;
 		SimpleDateFormat sdf =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		sdf.setTimeZone(TimeZone.getTimeZone("EST"));
 		String startTime = sdf.format(new Date());
 	    try {
 	    	 Class.forName("com.mysql.jdbc.Driver");
@@ -86,7 +88,7 @@ public class BatchCampaignController implements IBatchCampaignController {
 		     callableStatement.setString(3, association);
 		     callableStatement.executeUpdate();
 		     callableStatement.close();
-		     con.close();    
+		     con.close();  
 	    }
 	    catch(Exception e){log.error(e.getMessage());}
 	    return uuid;
