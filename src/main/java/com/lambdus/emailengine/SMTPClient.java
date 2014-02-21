@@ -3,6 +3,8 @@ package com.lambdus.emailengine;
 import java.io.UnsupportedEncodingException;
 import java.security.Security;
 import java.util.Properties;
+import java.util.Random;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -26,6 +28,7 @@ public class SMTPClient {
         private String emailCreative;
         private int templateId;
         private String uuid;
+        private String canonical;
         
         public SMTPClient(String emailAddress, String emailCreative, String subjectLine, String fromAddress, String fromName) 
         {
@@ -56,8 +59,10 @@ public class SMTPClient {
         
         public SMTPClient(String emailAddress, String emailCreative, String subjectLine, String fromAddress, String fromName, int templateId, String uuid) 
         {
+        //this.canonical = randomSelectCanonicalSender(fromAddress, 2);	
         this.properties.setProperty("mail.smtp.host", "localhost");
         this.properties.setProperty("mail.smtp.port", "587");
+        //this.properties.setProperty("mail.smtp.from", this.canonical); //Return Path
         this.session = Session.getInstance(this.properties);
         this.toAddress = emailAddress;
         this.emailCreative = emailCreative;
@@ -87,7 +92,14 @@ public class SMTPClient {
           CustomMimeMessage message = new CustomMimeMessage(this.session, this.templateId);
           message.setHeader("X-MailingID", String.format("%d::%s", this.templateId, this.uuid));
           message.setHeader("X-FBL", MailingProperties.base64(this.toAddress));
-          message.setFrom(new InternetAddress(this.fromAddress, this.fromName));
+          //message.setFrom(new InternetAddress(this.fromAddress, this.fromName));
+          
+          //Change static 2 param to dynamic
+          this.canonical = randomSelectCanonicalSender(this.fromAddress, 2);
+          
+          message.setFrom(new InternetAddress(this.canonical, this.fromName));
+          //message.addFrom(new InternetAddress(this.canonical, this.fromName).getGroup(false));
+          
           message.addRecipient(Message.RecipientType.TO,
                                     new InternetAddress(this.toAddress));
           message.setSubject(this.subjectLine);
@@ -102,6 +114,18 @@ public class SMTPClient {
       }catch (UnsupportedEncodingException uee) {
                  log.info(uee.getMessage());
         }
+        }
+        
+        private String randomSelectCanonicalSender(String from, int hostlimit){
+        	try{
+        	String domain = from.split("\\@")[1];
+        	String [] localhandles = new String[hostlimit];
+        	for (int i = 0; i < hostlimit; i++){
+        		localhandles[i] = ("local" + (i+1));
+        	}
+        	String randHandle = localhandles[new Random().nextInt(localhandles.length)];
+        	return (randHandle + "@" + domain);
+        	}catch(Exception e){log.error(e.getMessage()); return "";}
         }
 
 }
