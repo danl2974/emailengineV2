@@ -6,13 +6,13 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
-        <dependent-module archiveName="postgresql-9.3-1100.jdbc4.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/javalibs/postgresql-9.3-1100.jdbc4.jar">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
         <dependent-module archiveName="mysql-connector-java-5.1.29-bin.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/javalibs/mysql-connector-java-5.1.29-bin.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="sqljdbc4.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/javalibs/sqljdbc4.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="postgresql-9.3-1100.jdbc4.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/javalibs/postgresql-9.3-1100.jdbc4.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="java-output-path" value="/LambdusEmailEngine/target/classes"/>

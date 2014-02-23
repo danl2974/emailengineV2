@@ -21,7 +21,7 @@ import redis.clients.jedis.Jedis;
 public class MessageAssembler {
         
         private static final Logger log = Logger.getLogger(MessageAssembler.class.getName());
-        private static final String[] templateKeys = {"creative","subjectline","fromaddress", "fromname"};
+        private static final String[] templateKeys = {"creative","subjectline","fromaddress", "fromname", "domain"};
         
         public String template;
         public String assembledMessage;
@@ -137,8 +137,6 @@ public class MessageAssembler {
              Criteria cb = session.createCriteria(TemplatePersist.class);
              result = (TemplatePersist) cb.add(Restrictions.eq("id",templateId)).uniqueResult();
              session.getTransaction().commit();
-             
-             log.info("Template ID " + result.getId() + "fetched from Database");
              
         	 }
            catch(Exception e){

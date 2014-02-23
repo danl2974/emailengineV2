@@ -99,6 +99,7 @@ public class SMTPClient {
           
           message.setFrom(new InternetAddress(this.canonical, this.fromName));
           //message.addFrom(new InternetAddress(this.canonical, this.fromName).getGroup(false));
+          log.info("LOCAL " + this.canonical);
           
           message.addRecipient(Message.RecipientType.TO,
                                     new InternetAddress(this.toAddress));
