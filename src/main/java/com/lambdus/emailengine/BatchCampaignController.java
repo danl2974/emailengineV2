@@ -115,7 +115,7 @@ public class BatchCampaignController implements IBatchCampaignController {
 	
 	
 	
-	 private String resolveAssociation(int targetId)
+	 public static String resolveAssociation(int targetId)
 	 {
 		ResultSet rs = null;
 		Connection con = null;
