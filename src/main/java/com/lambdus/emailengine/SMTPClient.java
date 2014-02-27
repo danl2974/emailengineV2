@@ -60,7 +60,7 @@ public class SMTPClient {
         public SMTPClient(String emailAddress, String emailCreative, String subjectLine, String fromAddress, String fromName, int templateId, String uuid) 
         {
         //this.canonical = randomSelectCanonicalSender(fromAddress, 2);	
-        this.properties.setProperty("mail.smtp.host", "localhost");
+        this.properties.setProperty("mail.smtp.host", "54.84.100.224");
         this.properties.setProperty("mail.smtp.port", "587");
         //this.properties.setProperty("mail.smtp.from", this.canonical); //Return Path
         this.session = Session.getInstance(this.properties);
