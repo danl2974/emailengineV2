@@ -82,7 +82,21 @@ public class MessageAssembler {
                m.appendReplacement(sb, " href=\"" + clickUrl + "&&&" + hyperlink + "\"");
             }
             m.appendTail(sb);
-            return sb.toString().replace("</body>", "<img src=\"" + openUrl + "\" width=\"1\" height=\"1\" style=\"border-width:0; border-style:hidden;\" Alt=\"\" /></body>");
+            String trackedMessage;
+            if (sb.toString().indexOf("</body>") != -1)
+            {
+            	trackedMessage = sb.toString().replace("</body>", "<img src=\"" + openUrl + "\" width=\"1\" height=\"1\" style=\"border-width:0; border-style:hidden;\" Alt=\"\" /></body>");
+            }
+            else if (sb.toString().indexOf("</html>") != -1)
+            {
+            	trackedMessage = sb.toString().replace("</html>", "<img src=\"" + openUrl + "\" width=\"1\" height=\"1\" style=\"border-width:0; border-style:hidden;\" Alt=\"\" /></html>");
+            }            
+            else
+            {
+            	trackedMessage = sb.append("<img src=\"" + openUrl + "\" width=\"1\" height=\"1\" style=\"border-width:0; border-style:hidden;\" Alt=\"\" />").toString();
+            }
+            
+            return trackedMessage;
          }
         
         private void checkCache(int templateId)
