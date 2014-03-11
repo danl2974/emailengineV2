@@ -92,6 +92,7 @@ public class SMTPClient {
           CustomMimeMessage message = new CustomMimeMessage(this.session, this.templateId);
           message.setHeader("X-MailingID", String.format("%d::%s", this.templateId, this.uuid));
           message.setHeader("X-FBL", MailingProperties.base64(this.toAddress));
+          message.setHeader("List-Unsubscribe", String.format("<mailto:listunsubscribe@f.%s>", this.fromAddress.split("\\@")[1] ));
           //message.setFrom(new InternetAddress(this.fromAddress, this.fromName));
           
           //Change static 2 param to dynamic
@@ -99,7 +100,6 @@ public class SMTPClient {
           
           message.setFrom(new InternetAddress(this.canonical, this.fromName));
           //message.addFrom(new InternetAddress(this.canonical, this.fromName).getGroup(false));
-          log.info("LOCAL " + this.canonical);
           
           message.addRecipient(Message.RecipientType.TO,
                                     new InternetAddress(this.toAddress));
