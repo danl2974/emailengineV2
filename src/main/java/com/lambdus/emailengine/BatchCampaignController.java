@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -32,6 +33,8 @@ public class BatchCampaignController implements IBatchCampaignController {
 	
 	private int templateId;
 	
+	private List<Integer> targetIds;
+	
 	private int targetId;
 	
 	//MAKE CONFIG
@@ -44,29 +47,36 @@ public class BatchCampaignController implements IBatchCampaignController {
 	public void startCampaign(){
 		
 		String uuid = UUID.randomUUID().toString();
-		String association = resolveAssociation(this.targetId);
+		//String association = resolveAssociation(this.targetId);
+		log.info("startCampaign targets size " + this.targetIds.size());
+		String association = resolveAssociation(this.targetIds.get(0));
 		
-        BatchRequest request = new BatchRequest();
-        request.setTargetId(this.targetId);
-        request.setTemplateId(this.templateId);
-        request.setUuid(uuid);
+		Integer result = 0;
+		
+		for(Integer target : this.targetIds){
+		  log.info("Target in for loop with startCampaign " + target);	
+          BatchRequest request = new BatchRequest();
+          request.setTargetId(target);
+          request.setTemplateId(this.templateId);
+          request.setUuid(uuid);
         
-        BatchProcessor bp = new BatchProcessor(request);
-        //FutureTask futureTask = new FutureTask(bp);
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        //executorService.submit(futureTask);
+          BatchProcessor bp = new BatchProcessor(request);
+          //FutureTask futureTask = new FutureTask(bp);
+          ExecutorService executorService = Executors.newSingleThreadExecutor();
+          //executorService.submit(futureTask);
  
-        Integer result = 0;
-        FutureTask<Integer> submittedBatchTask = (FutureTask<Integer>) executorService.submit(bp);
+          //Integer result = 0;
+          FutureTask<Integer> submittedBatchTask = (FutureTask<Integer>) executorService.submit(bp);
         
-         while(!submittedBatchTask.isDone()){
-         try{result = submittedBatchTask.get();}
-         catch (InterruptedException ie) {log.error(ie.getMessage());return;}
-         catch (ExecutionException ee) {log.error(ee.getMessage());return;}
-         }
-         
+           while(!submittedBatchTask.isDone()){
+            try{result += submittedBatchTask.get();}
+            catch (InterruptedException ie) {log.error(ie.getMessage());return;}
+            catch (ExecutionException ee) {log.error(ee.getMessage());return;}
+            }
+           executorService.shutdown(); 
+	     } 
     	 addBatchCampaignMonitorData(result, addNewBatchCampaignMonitor(uuid, association));
-		 executorService.shutdown();
+		 //executorService.shutdown();
 	}
 	
 	
@@ -154,6 +164,7 @@ public class BatchCampaignController implements IBatchCampaignController {
     {
             this.templateId = templateId;
     }
+	
     
     public int getTargetId()
     {
@@ -165,5 +176,16 @@ public class BatchCampaignController implements IBatchCampaignController {
             return this.templateId;
     }
     
+    @Override
+    public void setTargetIds(List<Integer> targetIds)
+    {
+            this.targetIds = targetIds;
+    }
+    
+    public List<Integer> getTargetIds()
+    {
+            return this.targetIds;
+    }	
+	
 
 }

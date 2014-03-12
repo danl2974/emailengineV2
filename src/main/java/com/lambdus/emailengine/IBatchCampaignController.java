@@ -1,5 +1,7 @@
 package com.lambdus.emailengine;
 
+import java.util.List;
+
 public interface IBatchCampaignController {
 	
 	void startCampaign();
@@ -8,5 +10,6 @@ public interface IBatchCampaignController {
 
     void setTemplateId(int templateId);
 
-
+    void setTargetIds(List<Integer> targetIds);
+    
 }
