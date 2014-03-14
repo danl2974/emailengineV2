@@ -89,7 +89,7 @@ public class SMTPClient {
           message.setContent(this.emailCreative,
                                     "text/html");
           */
-          CustomMimeMessage message = new CustomMimeMessage(this.session, this.templateId);
+          CustomMimeMessage message = new CustomMimeMessage(this.session, this.templateId, this.uuid);
           message.setHeader("X-MailingID", String.format("%d::%s", this.templateId, this.uuid));
           message.setHeader("X-FBL", MailingProperties.base64(this.toAddress));
           message.setHeader("List-Unsubscribe", String.format("<mailto:listunsubscribe@f.%s>", this.fromAddress.split("\\@")[1] ));
